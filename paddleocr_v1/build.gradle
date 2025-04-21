@@ -1,0 +1,67 @@
+plugins {
+    alias(libs.plugins.android.library)
+}
+
+android {
+    namespace 'com.jzzh.paddleocr'
+    compileSdk 35
+
+    defaultConfig {
+        minSdk 30
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+        externalNativeBuild {
+
+            cmake {
+
+                cppFlags "-std=c++11 -frtti -fexceptions -Wno-format"
+                arguments '-DANDROID_PLATFORM=android-23','-DANDROID_STL=c++_shared',"-DANDROID_ARM_NEON=TRUE",
+                        "-DANDROID_ALLOW_UNDEFINED_SYMBOLS=true"
+            }
+        }
+        ndk {
+
+            abiFilters "arm64-v8a" //"armeabi-v7a"
+        }
+        ndkVersion "21.4.7075529"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+            version "3.22.1"
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    libraryVariants.configureEach { variant ->
+        variant.outputs.all {
+            outputFileName = "${project.name}.aar"
+        }
+    }
+    sourceSets {
+        main {
+            assets {
+                srcDirs 'src/main/assets'
+            }
+        }
+    }
+}
+
+dependencies {
+
+    implementation libs.appcompat
+    implementation libs.material
+    testImplementation libs.junit
+    androidTestImplementation libs.ext.junit
+    androidTestImplementation libs.espresso.core
+}
